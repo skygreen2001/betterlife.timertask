@@ -1,0 +1,8 @@
+<html>
+<body>
+<h3>Hi ${message.userName}, Welcome to the Betterlife CMS Framework!</h3>
+<div>
+Your email address is <a href="mailto:${message.mailto}">${message.mailto}</a>.
+</div>
+</body>
+</html>
