@@ -9,6 +9,11 @@
    		6.方便快捷开发,命名|代码通俗易懂 
    		7.提供工具类自动生成实体类,减少重复工作量
    
+启动运行类:
+    Application.java : 主程序运行起点
+    tools/AutoCodeDomain.java : 生动生成实体数据对象工具类
+
+
 框架规划:      
 	spring+hibernate+quartz
 	windows service
