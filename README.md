@@ -13,12 +13,20 @@
     Application.java : 主程序运行起点
     tools/AutoCodeDomain.java : 生动生成实体数据对象工具类
 
+部署:
+    Eclipse:Export->Runnable JAR file->Select[Library handling:Copy required libraries into generated JAR]->Click Finish
+               一般相对项目根目录导出到build目录下:betterlife.timertask.jar
+              在该目录下 运行指令:java -jar betterlife.timertask.jar
+    
+               默认运行:build/startup.bat
+
+	参考:[Running a Java Application as a Windows Service]:http://wrapper.tanukisoftware.org
+              暂未采用该方案，优先考虑免费开源的解决方法
 
 框架规划:      
 	spring+hibernate+quartz
 	windows service
 			 支持mysql，sqlserver
-
 
 开发工具:
 	JDK                (version:1.7)  :http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
