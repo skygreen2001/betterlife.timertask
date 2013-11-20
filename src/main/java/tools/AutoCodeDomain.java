@@ -10,8 +10,8 @@ import java.util.regex.Matcher;
 
 import org.apache.commons.lang.WordUtils;
 
+import common.Gc;
 import common.log.LogMe;
-
 import dao.DaoManager;
 
 /**
@@ -26,8 +26,8 @@ public class AutoCodeDomain {
 	public static void main(String[] args) throws Exception {
 		modelPath = System.getProperty("user.dir") + File.separator + "model"
 				+ File.separator + "domain" + File.separator;
-		 mysql_domain();
-		sqlserver_domain();
+		if (!Gc.isCloseMysql)mysql_domain();
+		if (!Gc.isCloseSqlserver)sqlserver_domain();
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class AutoCodeDomain {
 		BufferedWriter bw;
 		for (Entry<String, Map<String, String>> entry : map.entrySet()) {
 			tablename = entry.getKey();
-			class_name =  "S"+AutoCodeSqlserver.class_name(tablename);
+			class_name = "S" + AutoCodeSqlserver.class_name(tablename);
 			package_name = AutoCodeSqlserver.package_name(tablename);
 			field_spec = AutoCodeSqlserver.field_spec(tablename, class_name);
 			instance_name = AutoCodeSqlserver.instance_name(tablename);
@@ -57,13 +57,11 @@ public class AutoCodeDomain {
 					class_name, field_spec, instance_name);
 			// System.out.println(modelContent);
 			try {
-				modelFileDir = modelPath
-						+ "sqlserver"
-						+ File.separator;
+				modelFileDir = modelPath + "sqlserver" + File.separator;
 				File currentModeDir = new File(modelFileDir);
 				if (!currentModeDir.exists())
 					currentModeDir.mkdirs();
-				File currentModelFile = new File(modelFileDir,class_name
+				File currentModelFile = new File(modelFileDir, class_name
 						+ ".java");
 				if (!currentModelFile.exists()) {
 					currentModelFile.createNewFile();
@@ -145,7 +143,7 @@ public class AutoCodeDomain {
 		private static String package_name(String tablename) {
 			String[] names = tablename.split("_");
 			if ((names != null) && (names.length > 0)) {
-				String package_name = "";				
+				String package_name = "";
 				if (names.length > 1) {
 					for (int i = 1; i < names.length - 1; i++) {
 						if (names[i].equals("re"))
@@ -180,15 +178,17 @@ public class AutoCodeDomain {
 			Map<String, String> element;
 			fields = DaoManager.dbinfoMysql().fieldInfoList(tablename);
 			String column_name, column_comment_name, uccolumn_name, id_annotation = "", column_comment = "", type = "", setgetter = "";
-            String id_declare_str="",id_str="",commitTimeStr="",updateTimeStr="",tmpStr,tmpDeclareStr;
-            
+			String id_declare_str = "", id_str = "", commitTimeStr = "", updateTimeStr = "", tmpStr, tmpDeclareStr;
+
 			for (Entry<String, Map<String, String>> entry : fields.entrySet()) {
 				column_name = entry.getKey();
 				element = entry.getValue();
 				type = column_type(element.get("Type"));
-				if (column_name.toUpperCase().equals(class_name.toUpperCase() + "_ID")) {
-					column_comment=element.get("Comment");
-					if(column_comment==null)column_comment=column_name;
+				if (column_name.toUpperCase().equals(
+						class_name.toUpperCase() + "_ID")) {
+					column_comment = element.get("Comment");
+					if (column_comment == null)
+						column_comment = column_name;
 					column_comment_name = column_comment_name(column_comment);
 					column_comment = column_comment(column_comment);
 					type = "Long";
@@ -197,12 +197,15 @@ public class AutoCodeDomain {
 
 				} else {
 					id_annotation = "";
-					column_comment=element.get("Comment");
-					if(column_comment==null)column_comment=column_name;
+					column_comment = element.get("Comment");
+					if (column_comment == null)
+						column_comment = column_name;
 					column_comment_name = column_comment_name(column_comment);
 					column_comment = column_comment(column_comment);
 				}
-				if ((column_comment_name==null)||(column_comment_name.trim().length()<=0))LogMe.debug(column_name+":无注释");
+				if ((column_comment_name == null)
+						|| (column_comment_name.trim().length() <= 0))
+					LogMe.debug(column_name + ":无注释");
 				uccolumn_name = WordUtils.capitalize(column_name);
 
 				if (column_name.toUpperCase().equals("COMMITTIME")) {
@@ -220,7 +223,8 @@ public class AutoCodeDomain {
 							+ "		return (" + type + ")updateTime;\r\n"
 							+ "	}\r\n\r\n";
 				} else {
-					tmpDeclareStr = "	private " + type + " " + column_name + ";\r\n";
+					tmpDeclareStr = "	private " + type + " " + column_name
+							+ ";\r\n";
 					tmpStr = "	/**\r\n" + column_comment + "\r\n"
 							+ "	 * @return " + column_name + ":"
 							+ column_comment_name + "\r\n" + "	 */\r\n"
@@ -234,16 +238,18 @@ public class AutoCodeDomain {
 							+ "		this." + column_name + " = " + column_name
 							+ ";\r\n" + "	}\r\n\r\n";
 
-					if (column_name.toUpperCase().equals(class_name.toUpperCase() + "_ID")) {
-						id_str=tmpStr;
-						id_declare_str=tmpDeclareStr;
-					}else{
-						setgetter+=tmpStr;
-						result+=tmpDeclareStr;
+					if (column_name.toUpperCase().equals(
+							class_name.toUpperCase() + "_ID")) {
+						id_str = tmpStr;
+						id_declare_str = tmpDeclareStr;
+					} else {
+						setgetter += tmpStr;
+						result += tmpDeclareStr;
 					}
 				}
 			}
-			result = "\r\n"+id_declare_str+result +id_str+ setgetter+commitTimeStr+updateTimeStr;
+			result = "\r\n" + id_declare_str + result + id_str + setgetter
+					+ commitTimeStr + updateTimeStr;
 			result = result.substring(0, result.length() - 2);
 			return result;
 		}
@@ -289,7 +295,8 @@ public class AutoCodeDomain {
 		 * @return
 		 */
 		private static String column_comment_name(String column_comment) {
-			if ((column_comment!=null)&&(column_comment.trim().length()>0)){
+			if ((column_comment != null)
+					&& (column_comment.trim().length() > 0)) {
 				String[] column_comment_r = column_comment.split("\\n|\\r");
 				column_comment = column_comment_r[0];
 			}
@@ -303,14 +310,15 @@ public class AutoCodeDomain {
 		 * @return
 		 */
 		private static String column_comment(String column_comment) {
-			if ((column_comment!=null)&&(column_comment.trim().length()>0)){
+			if ((column_comment != null)
+					&& (column_comment.trim().length() > 0)) {
 				String[] column_comment_r = column_comment.split("\\n|\\r");
 				column_comment = "";
 				for (String comment : column_comment_r) {
 					if ((comment != null) && (comment.trim().length() > 0))
 						column_comment += "	 * " + comment + "\r\n";
 				}
-	
+
 				if (column_comment.contains("\r\n")) {
 					column_comment = column_comment.substring(0,
 							column_comment.length() - 2);
@@ -451,31 +459,35 @@ public class AutoCodeDomain {
 			Map<String, String> element;
 			fields = DaoManager.dbinfoSqlserver().fieldInfoList(tablename);
 			String column_name, column_comment_name, uccolumn_name, id_annotation = "", column_comment = "", type = "", setgetter = "";
-            String id_declare_str="",id_str="",commitTimeStr="",updateTimeStr="",tmpStr,tmpDeclareStr;
+			String id_declare_str = "", id_str = "", commitTimeStr = "", updateTimeStr = "", tmpStr, tmpDeclareStr;
 			for (Entry<String, Map<String, String>> entry : fields.entrySet()) {
 				column_name = entry.getKey();
 				element = entry.getValue();
 				type = column_type(element.get("Type"));
 
 				if (column_name.toUpperCase().equals("ID")) {
-					column_comment=element.get("Comment");
-					if(column_comment==null)column_comment=column_name;
+					column_comment = element.get("Comment");
+					if (column_comment == null)
+						column_comment = column_name;
 					column_comment_name = column_comment_name(column_comment);
 					column_comment = column_comment(column_comment);
 					type = "String";
-					id_annotation = "	@Id\r\n"+ 
-									"	@GenericGenerator(name = \"uuid\", strategy = \"uuid2\")\r\n"+ 
-									"	@GeneratedValue(generator = \"uuid\")\r\n"+ 
-									"	@Column(name = \"ID\", unique = true)\r\n";
+					id_annotation = "	@Id\r\n"
+							+ "	@GenericGenerator(name = \"uuid\", strategy = \"uuid2\")\r\n"
+							+ "	@GeneratedValue(generator = \"uuid\")\r\n"
+							+ "	@Column(name = \"ID\", unique = true)\r\n";
 
 				} else {
 					id_annotation = "";
-					column_comment=element.get("Comment");
-					if(column_comment==null)column_comment=column_name;
+					column_comment = element.get("Comment");
+					if (column_comment == null)
+						column_comment = column_name;
 					column_comment_name = column_comment_name(column_comment);
 					column_comment = column_comment(column_comment);
 				}
-				if ((column_comment_name==null)||(column_comment_name.trim().length()<=0))LogMe.debug(column_name+":无注释");
+				if ((column_comment_name == null)
+						|| (column_comment_name.trim().length() <= 0))
+					LogMe.debug(column_name + ":无注释");
 				uccolumn_name = WordUtils.capitalize(column_name);
 
 				if (column_name.toUpperCase().equals("COMMITTIME")) {
@@ -483,7 +495,8 @@ public class AutoCodeDomain {
 							+ "	 * @return " + column_name + ":"
 							+ column_comment_name + "\r\n" + "	 */\r\n"
 							+ "	public " + type + " get" + uccolumn_name
-							+ "() {\r\n" + "		return (" + type + ") this.commitTime;\r\n" + "	}\r\n\r\n";
+							+ "() {\r\n" + "		return (" + type
+							+ ") this.commitTime;\r\n" + "	}\r\n\r\n";
 				} else if (column_name.toUpperCase().equals("UPDATETIME")) {
 					updateTimeStr = "	/**\r\n" + column_comment + "\r\n"
 							+ "	 * @return " + column_name + ":"
@@ -491,9 +504,11 @@ public class AutoCodeDomain {
 							+ "	public " + type + " getUpdateTime() {\r\n"
 							+ "		return updateTime;\r\n" + "	}\r\n\r\n";
 				} else {
-					if (!column_name.toUpperCase().equals("ID"))column_name=WordUtils.uncapitalize(column_name);
-					tmpDeclareStr="	private " + type + " " + column_name + ";\r\n";
-					tmpStr  = "	/**\r\n" + column_comment + "\r\n"
+					if (!column_name.toUpperCase().equals("ID"))
+						column_name = WordUtils.uncapitalize(column_name);
+					tmpDeclareStr = "	private " + type + " " + column_name
+							+ ";\r\n";
+					tmpStr = "	/**\r\n" + column_comment + "\r\n"
 							+ "	 * @return " + column_name + ":"
 							+ column_comment_name + "\r\n" + "	 */\r\n"
 							+ id_annotation + "	public " + type + " get"
@@ -506,15 +521,16 @@ public class AutoCodeDomain {
 							+ "		this." + column_name + " = " + column_name
 							+ ";\r\n" + "	}\r\n\r\n";
 					if (column_name.toUpperCase().equals("ID")) {
-						id_str=tmpStr;
-						id_declare_str=tmpDeclareStr;
-					}else{
-						setgetter+=tmpStr;
+						id_str = tmpStr;
+						id_declare_str = tmpDeclareStr;
+					} else {
+						setgetter += tmpStr;
 						result += tmpDeclareStr;
 					}
 				}
 			}
-			result = "\r\n"+id_declare_str+result +id_str+ setgetter+commitTimeStr+updateTimeStr;
+			result = "\r\n" + id_declare_str + result + id_str + setgetter
+					+ commitTimeStr + updateTimeStr;
 			result = result.substring(0, result.length() - 2);
 			return result;
 		}
@@ -560,7 +576,8 @@ public class AutoCodeDomain {
 		 * @return
 		 */
 		private static String column_comment_name(String column_comment) {
-			if ((column_comment!=null)&&(column_comment.trim().length()>0)){
+			if ((column_comment != null)
+					&& (column_comment.trim().length() > 0)) {
 				String[] column_comment_r = column_comment.split("\\n|\\r");
 				column_comment = column_comment_r[0];
 			}
@@ -574,14 +591,15 @@ public class AutoCodeDomain {
 		 * @return
 		 */
 		private static String column_comment(String column_comment) {
-			if ((column_comment!=null)&&(column_comment.trim().length()>0)){
+			if ((column_comment != null)
+					&& (column_comment.trim().length() > 0)) {
 				String[] column_comment_r = column_comment.split("\\n|\\r");
 				column_comment = "";
 				for (String comment : column_comment_r) {
 					if ((comment != null) && (comment.trim().length() > 0))
 						column_comment += "	 * " + comment + "\r\n";
 				}
-	
+
 				if (column_comment.contains("\r\n")) {
 					column_comment = column_comment.substring(0,
 							column_comment.length() - 2);

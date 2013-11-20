@@ -28,6 +28,7 @@ public class DaoTasks extends Tasks {
 
 	@Scheduled(cron = "*/5 * * * * SUN-SAT")
 	public void runMysqlTest() {
+		if (Gc.isCloseMysql)return;
 		LogMe.debug("执行Mysql Test开始时间: " + dateFormat.format(new Date()));
 		Admin admin = new Admin();
 		admin.setUsername("aaaa");
@@ -124,6 +125,7 @@ public class DaoTasks extends Tasks {
 
 	@Scheduled(cron = "*/6 * * * * SUN-SAT")
 	public void runSqlserverTest() {
+		if (Gc.isCloseSqlserver)return;
 		LogMe.debug("执行Sqlserver Test开始时间: "
 				+ dateFormat.format(new Date()));
 

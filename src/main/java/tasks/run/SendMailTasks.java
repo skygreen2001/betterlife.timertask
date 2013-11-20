@@ -6,6 +6,7 @@ import java.util.Date;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import common.Gc;
 import common.log.LogMe;
 import common.mail.MailSender;
 import domain.MailObject;
@@ -25,6 +26,7 @@ public class SendMailTasks extends Tasks {
 		@Scheduled(cron = "*/8 * * * * SUN-SAT")
 		public void sendEmail() 
 		{
+			if (!Gc.isRunEmail)return;
 			LogMe.debug("发送邮件开始时间: " + dateFormat.format(new Date()));
 			MailObject mail=new MailObject();
 			mail.setMailto("skygreen2001@163.com");

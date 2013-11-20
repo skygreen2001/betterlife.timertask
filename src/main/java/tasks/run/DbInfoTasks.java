@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import common.Gc;
 import common.log.LogMe;
 import dao.DaoManager;
 
@@ -21,6 +22,7 @@ public class DbInfoTasks {
 
 	@Scheduled(initialDelay = 1000, fixedRate = 60000)
 	public void dbInfoMysql() {
+		if (Gc.isCloseMysql)return;
 		List<String> list = DaoManager.dbinfoMysql().tableList();
 		for (String tablename : list) {
 			LogMe.debug(tablename);
@@ -60,6 +62,7 @@ public class DbInfoTasks {
 
 	@Scheduled(initialDelay = 2000, fixedRate = 70000)
 	public void dbInfoSqlserver() {
+		if (Gc.isCloseSqlserver)return;
 		List<String> list = DaoManager.dbinfoSqlserver().tableList();
 		for (String tablename : list) {
 			LogMe.debug(tablename);

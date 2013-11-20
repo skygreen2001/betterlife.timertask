@@ -3,6 +3,8 @@ import java.util.Set;
 import org.reflections.Reflections;
 import org.springframework.boot.SpringApplication;
 
+import common.Gc;
+
 import tasks.Tasks;
 
 /**
@@ -13,7 +15,7 @@ import tasks.Tasks;
  */
 public class Application {
 	public static void main(String[] args) throws Exception {
-//		runTasks();
+		if (Gc.isRunTasks)runTasks();
 	}
 	
 	/**

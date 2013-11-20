@@ -10,6 +10,8 @@
 	http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
 	<bean id="sqlscript" class="common.SqlConfig">
+		<property name="closeSqlserver"><value type="java.lang.Boolean">false</value></property>
+		<property name="closeMysql"><value type="java.lang.Boolean">false</value></property>
 		<property name="maps">
 			<util:map>
 				<entry key="takeBlog"
