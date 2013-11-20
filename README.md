@@ -31,7 +31,9 @@
 开发工具:
 	JDK                (version:1.7)  :http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 	Spring Tools Suites(version:3.4.0):http://spring.io/tools/sts/all
-	Maven              (version:3.1.1):http://maven.apache.org/download.cgi
+				安装plugins[在Dashboard首页上]:
+				        Groovy 2.1 compiler for groovy-eclipse
+				        Groovy-Eclipse
 
 注意事项:
 连接SqlServer数据库，需要做以下准备工作
