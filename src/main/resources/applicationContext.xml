@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<bean id="sqlscript" class="com.betterlife.timertask.common.SqlConfig">
+		<property name="closeSqlserver"><value type="java.lang.Boolean">true</value></property>
+		<property name="closeMysql"><value type="java.lang.Boolean">false</value></property>
+		<property name="maps">
+			<util:map>
+				<entry key="takeBlog"
+					value="select * from bb_core_blog a,bb_user_user b where a.user_id=b.user_id" />
+				<entry key="getAdmin" value="select * from admin" />
+				<entry key="updateAdmin" value="update admin set username='' where admin_id=1" />
+			</util:map>
+		</property>
+		<property name="sqlserver_maps">
+			<util:map>
+				<entry key="takeBlog"
+					value="select * from Blog a,[User] b where a.User_ID=b.ID" />
+			</util:map>
+		</property>
+	</bean>
+
+	<import resource="applicationContext_mysql.xml" />
+	<import resource="applicationContext_sqlserver.xml" />
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.exmail.qq.com" />
+		<property name="port" value="25" />
+		<property name="username" value="zhouyuepu@xun-ao.com" />
+		<property name="password" value="SA123.com" />
+
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.timeout">25000</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="velocityEngine"
+		  class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="velocityProperties">
+			<value>
+				resource.loader=class
+				class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+			</value>
+		</property>
+	</bean>
+
+	<bean id="mailService" class="com.betterlife.timertask.common.mail.MailSender">
+		<property name="mailSender" ref="mailSender" />
+		<property name="fromEmail" value="#{ mailSender.username }" />
+		<property name="defaultEncoding" value="#{ mailSender.defaultEncoding }" />
+		
+		<property name="velocityEngine" ref="velocityEngine" />
+		<property name="mailModelFileName" value="mail-content.vm" />
+	</bean>
+
+</beans>
+
+

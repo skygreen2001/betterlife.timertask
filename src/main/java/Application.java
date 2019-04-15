@@ -2,10 +2,10 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import common.Gc;
-
-import tasks.Tasks;
+import com.betterlife.timertask.common.Gc;
+import com.betterlife.timertask.tasks.Tasks;
 
 /**
  * Java定时任务
@@ -13,6 +13,7 @@ import tasks.Tasks;
  * @author skygreen2001@gmail.com
  *
  */
+@SpringBootApplication
 public class Application {
 	public static void main(String[] args) throws Exception {
 		if (Gc.isRunTasks)runTasks();
@@ -23,7 +24,7 @@ public class Application {
 	 */
 	public static void runTasks()
 	{
-		Reflections reflections = new Reflections("tasks.run");
+		Reflections reflections = new Reflections("com.betterlife.timertask.tasks.run");
 
 		Set<Class<? extends Tasks>> allClasses = reflections.getSubTypesOf(Tasks.class);
 		for (Class<? extends Tasks> object : allClasses) {

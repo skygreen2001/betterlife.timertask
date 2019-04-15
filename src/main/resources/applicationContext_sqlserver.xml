@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	
+	<bean id="dataSource_s" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"></property>
+		<property name="url" value="jdbc:sqlserver://localhost:1433;databaseName=BetterlifeNet"></property>
+		<property name="username" value="sa" />
+		<property name="password" value="123.com" />
+		
+		<property name="maxActive" value="100"></property>
+		<property name="maxIdle" value="30"></property>
+		<property name="maxWait" value="500"></property>
+		<property name="defaultAutoCommit" value="true"></property>
+	</bean>
+
+	<bean id="sessionFactory_s"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource_s" />
+		<property name="packagesToScan" value="com.betterlife.timertask.domain.sqlserver" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hbm2ddl.auto">update</prop>
+				<prop key="format_sql">true</prop>
+				<prop key="schemaUpdate">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="jdbcTemplate_s" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource"><ref bean="dataSource_s" /></property>
+	</bean>
+	
+	<bean id="daos" class="com.betterlife.timertask.dao.sqlserver.DaoS"> 
+		<property name="sessionFactory" ref="sessionFactory_s"/>
+<!-- 		<property name="jdbcTemplate" ref="jdbcTemplate_s"/> -->
+	</bean>
+	
+	<bean id="sqlscript_sqlserver" class="com.betterlife.timertask.dao.Sqlscript$Sqlserver">
+		<!-- <property name="sessionFactory" ref="sessionFactory"/> -->
+		<property name="jdbcTemplate" ref="jdbcTemplate_s"/>
+	</bean>
+	
+	<bean id="info_sqlserver" class="com.betterlife.timertask.dao.sqlserver.DbInfoSqlserver">
+		<property name="jdbcTemplate" ref="jdbcTemplate_s"/>
+	</bean>
+</beans>
+
+
